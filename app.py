@@ -1,136 +1,263 @@
-from flask import Flask, render_template, redirect, url_for, request, flash
-from flask_sqlalchemy import SQLAlchemy
-from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
-from werkzeug.security import generate_password_hash, check_password_hash
 import os
+import csv
+from datetime import datetime, date
 
-app = Flask(__name__)
-app.secret_key = "super-secret-key"  # o'zing o'zgartir
+from flask import (
+    Flask, render_template, redirect, url_for,
+    request, flash, send_file
+)
+from flask_login import (
+    LoginManager, login_user, login_required,
+    logout_user, current_user
+)
+from werkzeug.security import generate_password_hash, check_password_hash
 
-# ==========================
-# DATABASE SETTINGS
-# ==========================
-BASE_DIR = os.path.abspath(os.path.dirname(__file__))
-app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///" + os.path.join(BASE_DIR, "data.db")
-app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+from config import Config
+from models import (
+    db, User, Task, Vehicle, Organization, OutsourcingCompany, OrgTech,
+    Contract, SolarSite, EmployeeProfile, IjroTask,
+    WarehouseProduct, WarehouseRequest, WarehouseRequestItem,
+    Guest, Greeting, Building, GreenArea, seed_demo_data
+)
 
-db = SQLAlchemy(app)
+# =========================
+#       APP INIT
+# =========================
+app = Flask(
+    __name__,
+    template_folder="templates",
+    static_folder="static",
+)
+app.config.from_object(Config)
 
-# ==========================
-# LOGIN MANAGER
-# ==========================
-login_manager = LoginManager()
-login_manager.init_app(app)
+db.init_app(app)
+
+login_manager = LoginManager(app)
 login_manager.login_view = "login"
 
-
-# ==========================
-# USER MODEL
-# ==========================
-class User(UserMixin, db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(50), unique=True, nullable=False)
-    password = db.Column(db.String(255), nullable=False)
-    role = db.Column(db.String(20), default="user")  # "user" yoki "admin"
+# Upload folder
+os.makedirs(app.config.get("UPLOAD_FOLDER", "uploads"), exist_ok=True)
 
 
 @login_manager.user_loader
-def load_user(user_id):
-    return User.query.get(int(user_id))
+def load_user(user_id: str):
+    try:
+        return User.query.get(int(user_id))
+    except Exception:
+        return None
 
 
-# ==========================
-# DATABASE CREATE
-# ==========================
+@app.context_processor
+def inject_now():
+    return {"now": datetime.utcnow()}
+
+
+# =========================
+#   DATABASE AUTO INIT
+#   (Koyeb server ishga tushganda)
+# =========================
 with app.app_context():
     db.create_all()
+    try:
+        seed_demo_data(db)
+    except Exception:
+        # demo ma'lumot allaqachon qo'shilgan bo'lsa – jim o'tkazamiz
+        pass
 
 
-# ==========================
-# ROUTES
-# ==========================
-
-@app.route("/")
-def home():
-    if current_user.is_authenticated:
-        return redirect("/dashboard")
-    return render_template("home.html")  # Agar html bo'lmasa oddiy text qaytarsin:
-    # return "Welcome!"
-
-
-# ------------ REGISTER ------------
-@app.route("/register", methods=["GET", "POST"])
-def register():
-    if request.method == "POST":
-        username = request.form["username"]
-        password = request.form["password"]
-
-        existing = User.query.filter_by(username=username).first()
-        if existing:
-            flash("Bu username band!", "danger")
-            return redirect("/register")
-
-        hashed = generate_password_hash(password)
-        user = User(username=username, password=hashed, role="user")
-        db.session.add(user)
-        db.session.commit()
-
-        flash("Muvaffaqiyatli ro‘yxatdan o‘tildi!", "success")
-        return redirect("/login")
-
-    return render_template("register.html")
-
-
-# ------------ LOGIN ------------
+# =========================
+#          AUTH
+# =========================
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
-        username = request.form["username"]
-        password = request.form["password"]
+        email = request.form.get("email", "").strip().lower()
+        password = request.form.get("password", "")
 
-        user = User.query.filter_by(username=username).first()
-        if not user or not check_password_hash(user.password, password):
-            flash("Noto‘g‘ri login yoki parol!", "danger")
-            return redirect("/login")
+        user = User.query.filter_by(email=email).first()
 
-        login_user(user)
-        return redirect("/dashboard")
+        if not user or not check_password_hash(user.password_hash, password):
+            flash("Login yoki parol xato", "danger")
+            return render_template("auth/login.html")
 
-    return render_template("login.html")
+        login_user(user, remember=True)
+        flash("Xush kelibsiz!", "success")
+
+        if user.role == "admin":
+            return redirect(url_for("admin_panel"))
+        elif user.role == "manager":
+            return redirect(url_for("manager_dashboard"))
+        elif user.role == "employee":
+            return redirect(url_for("employee_panel"))
+        else:
+            return redirect(url_for("user_panel"))
+
+    return render_template("auth/login.html")
 
 
-# ------------ LOGOUT ------------
 @app.route("/logout")
 @login_required
 def logout():
     logout_user()
-    return redirect("/")
+    flash("Chiqdingiz", "info")
+    return redirect(url_for("login"))
 
 
-# ------------ USER DASHBOARD ------------
-@app.route("/dashboard")
+# =========================
+#        ROOT ROUTE
+# =========================
+@app.route("/")
 @login_required
-def dashboard():
-    return f"Salom, {current_user.username}!"
+def index():
+    if current_user.role == "admin":
+        return redirect(url_for("admin_panel"))
+    elif current_user.role == "manager":
+        return redirect(url_for("manager_dashboard"))
+    elif current_user.role == "employee":
+        return redirect(url_for("employee_panel"))
+    else:
+        return redirect(url_for("user_panel"))
 
 
-# ------------ ADMIN PANEL ------------
+# =========================
+#        ADMIN PANEL
+# =========================
 @app.route("/admin")
 @login_required
-def admin():
+def admin_panel():
     if current_user.role != "admin":
-        return "Ruxsat yo‘q! (Admin kerak)"
+        flash("Bu bo'limga faqat admin kira oladi", "warning")
+        return redirect(url_for("index"))
 
-    users = User.query.all()
-    return render_template("admin.html", users=users)
-
-
-# ------------ HEALTHCHECK (Koyeb uchun shart) ------------
-@app.route("/health")
-def health():
-    return "OK", 200
+    users = User.query.order_by(User.id.desc()).all()
+    return render_template("admin/panel.html", users=users)
 
 
-# =============== RUN ===============
+# ❗ faqat BIRTA admin_create_user – duplicate yo'q
+@app.route("/admin/create_user", methods=["POST"])
+@login_required
+def admin_create_user():
+    if current_user.role != "admin":
+        flash("Ruxsat yo'q", "danger")
+        return redirect(url_for("index"))
+
+    full_name = request.form.get("full_name", "").strip()
+    email = request.form.get("email", "").strip().lower()
+    role = request.form.get("role", "user")
+    password = request.form.get("password", "").strip()
+
+    if not full_name or not email:
+        flash("Ism va email majburiy", "warning")
+        return redirect(url_for("admin_panel"))
+
+    if not password:
+        password = "123456"
+
+    if User.query.filter_by(email=email).first():
+        flash("Bu email allaqachon mavjud", "warning")
+        return redirect(url_for("admin_panel"))
+
+    hashed = generate_password_hash(password)
+
+    new_user = User(
+        full_name=full_name,
+        email=email,
+        role=role,
+        password_hash=hashed,
+    )
+    db.session.add(new_user)
+    db.session.commit()
+
+    flash("Yangi foydalanuvchi yaratildi", "success")
+    return redirect(url_for("admin_panel"))
+
+
+# =========================
+#     MANAGER (RAHBAR)
+# =========================
+@app.route("/manager/dashboard")
+@login_required
+def manager_dashboard():
+    if current_user.role not in ("manager", "admin"):
+        flash("Bu bo'limga faqat rahbar kira oladi", "warning")
+        return redirect(url_for("index"))
+
+    total_tasks = Task.query.count()
+    done_tasks = Task.query.filter_by(status="done").count()
+    in_progress_tasks = Task.query.filter_by(status="in_progress").count()
+    ijro_count = IjroTask.query.count()
+    contracts_sum = db.session.query(
+        db.func.coalesce(db.func.sum(Contract.amount), 0)
+    ).scalar() or 0
+
+    vehicles = Vehicle.query.all()
+    employees_count = EmployeeProfile.query.count()
+    guests_count = Guest.query.count()
+
+    return render_template(
+        "manager/dashboard.html",
+        total_tasks=total_tasks,
+        done_tasks=done_tasks,
+        in_progress_tasks=in_progress_tasks,
+        ijro_count=ijro_count,
+        contracts_sum=int(contracts_sum),
+        vehicles=vehicles[:4],
+        employees_count=employees_count,
+        guests_count=guests_count,
+    )
+
+
+# =========================
+#      EMPLOYEE PANEL
+# =========================
+@app.route("/employee")
+@login_required
+def employee_panel():
+    if current_user.role != "employee":
+        flash("Bu bo'limga faqat xodim kira oladi", "warning")
+        return redirect(url_for("index"))
+
+    tasks = Task.query.filter_by(assignee_id=current_user.id).all()
+    return render_template("employee/panel.html", tasks=tasks)
+
+
+# =========================
+#        USER PANEL
+# =========================
+@app.route("/user")
+@login_required
+def user_panel():
+    requests_q = WarehouseRequest.query.filter_by(
+        creator_id=current_user.id
+    ).order_by(WarehouseRequest.created_at.desc())
+
+    return render_template("user/panel.html", requests=requests_q.all())
+
+
+# =========================
+#   SIMPLE PLACEHOLDERS
+#   (ijro, ombor, orgtech va hokazo)
+# =========================
+@app.route("/ijro")
+@login_required
+def ijro_module():
+    return "Ijro moduli hali to'liq sozlanmagan"
+
+
+@app.route("/warehouse")
+@login_required
+def warehouse_module():
+    return "Ombor moduli hali to'liq sozlanmagan"
+
+
+@app.route("/orgtech")
+@login_required
+def orgtech_module():
+    return "Org texnika moduli hali to'liq sozlanmagan"
+
+
+# =========================
+#     LOCAL DEVELOPMENT
+# =========================
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=8000)
+    app.run(debug=True)
