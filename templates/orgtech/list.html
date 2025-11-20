@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block title %}Org texnika{% endblock %}
+{% block content %}
+<h4 class="mb-3">Org texnika moduli</h4>
+<div class="row g-3">
+  <div class="col-lg-5">
+    <div class="glass-card mb-3">
+      <h6 class="mb-3">Yangi org texnika qo'shish</h6>
+      <form method="post">
+        <div class="mb-2">
+          <label class="form-label small">Nomi</label>
+          <input name="name" class="form-control form-control-sm" required>
+        </div>
+        <div class="mb-2">
+          <label class="form-label small">Inventar raqami</label>
+          <input name="inventory_number" class="form-control form-control-sm">
+        </div>
+        <div class="mb-2">
+          <label class="form-label small">Kategoriya / holat</label>
+          <input name="category" class="form-control form-control-sm" placeholder="masalan: Aktiv, Zaxira, Ta'mirda">
+        </div>
+        <div class="mb-2">
+          <label class="form-label small">Joylashuvi</label>
+          <input name="location" class="form-control form-control-sm">
+        </div>
+        <div class="mb-2">
+          <label class="form-label small">Mas'ul xodim</label>
+          <input name="responsible_person" class="form-control form-control-sm">
+        </div>
+        <button class="btn btn-primary btn-sm mt-2">Saqlash</button>
+      </form>
+    </div>
+    <div class="glass-card">
+      <h6 class="mb-3">Excel (CSV) import / export</h6>
+      <form method="post" action="{{ url_for('manager_orgtech_import') }}" enctype="multipart/form-data" class="mb-2">
+        <div class="mb-2">
+          <input type="file" name="file" class="form-control form-control-sm" accept=".csv">
+        </div>
+        <button class="btn btn-outline-light btn-sm">CSV import</button>
+      </form>
+      <a href="{{ url_for('manager_orgtech_export') }}" class="btn btn-outline-light btn-sm">CSV export</a>
+      <p class="small text-muted mt-2 mb-0">
+        Fayl ajratgichi: <code>;</code><br>
+        Sarlavha: <code>id;name;inventory_number;location;responsible_person;status</code>
+      </p>
+    </div>
+  </div>
+  <div class="col-lg-7">
+    <div class="glass-card">
+      <h6 class="mb-3">Ro'yxat</h6>
+      <table class="table table-sm table-dark-glass align-middle mb-0">
+        <thead>
+          <tr><th>#</th><th>Nomi</th><th>Inventar</th><th>Joylashuvi</th><th>Mas'ul</th><th>Holat</th></tr>
+        </thead>
+        <tbody>
+        {% for i in items %}
+          <tr>
+            <td>{{ loop.index }}</td>
+            <td>{{ i.name }}</td>
+            <td>{{ i.inventory_number }}</td>
+            <td>{{ i.location }}</td>
+            <td>{{ i.responsible_person }}</td>
+            <td><span class="badge bg-secondary">{{ i.status }}</span></td>
+          </tr>
+        {% else %}
+          <tr><td colspan="6" class="text-muted small">Hali org texnika kiritilmagan.</td></tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

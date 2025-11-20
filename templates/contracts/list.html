@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Shartnomalar{% endblock %}
+{% block content %}
+<h4 class="mb-3">Shartnomalar</h4>
+<div class="glass-card">
+  <table class="table table-sm table-dark-glass align-middle mb-0">
+    <thead>
+      <tr><th>#</th><th>Sarlavha</th><th>Hamkor</th><th>Summa</th><th>Holat</th></tr>
+    </thead>
+    <tbody>
+    {% for c in contracts %}
+      <tr>
+        <td>{{ loop.index }}</td>
+        <td>{{ c.title }}</td>
+        <td>{{ c.partner or '-' }}</td>
+        <td>{{ c.amount }}</td>
+        <td>{{ c.status }}</td>
+      </tr>
+    {% else %}
+      <tr><td colspan="5" class="text-muted small">Shartnomalar yo'q.</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

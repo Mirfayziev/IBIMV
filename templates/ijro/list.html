@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}Ijro topshiriqlari{% endblock %}
+{% block content %}
+<h4 class="mb-3">Ijro topshiriqlari</h4>
+<div class="glass-card">
+  <table class="table table-sm table-dark-glass align-middle mb-0">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Sarlavha</th>
+        <th>Manba</th>
+        <th>Kelib tushgan sana</th>
+        <th>Muddat</th>
+        <th>Qolgan kun</th>
+        <th>Holat</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for t in tasks %}
+      {% set d = t.days_left %}
+      {% if d > 7 %}
+        {% set color = 'green' %}
+      {% elif d > 5 %}
+        {% set color = 'yellow' %}
+      {% elif d > 3 %}
+        {% set color = 'orange' %}
+      {% else %}
+        {% set color = 'red' %}
+      {% endif %}
+      <tr>
+        <td>{{ loop.index }}</td>
+        <td>{{ t.title }}</td>
+        <td>{{ t.source or '-' }}</td>
+        <td>{{ t.received_date.strftime('%d.%m.%Y') if t.received_date }}</td>
+        <td>{{ t.due_date.strftime('%d.%m.%Y') if t.due_date }}</td>
+        <td>
+          <span class="ijro-pill {{ color }}"></span>
+          {{ d }} kun
+        </td>
+        <td>{{ t.status }}</td>
+      </tr>
+      {% else %}
+      <tr><td colspan="7" class="text-muted small">Ijro topshiriqlari yo'q.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

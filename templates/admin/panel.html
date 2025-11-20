@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}Admin panel{% endblock %}
+{% block content %}
+<h4 class="mb-3">Admin panel</h4>
+<div class="row">
+  <div class="col-md-5">
+    <div class="glass-card mb-3">
+      <h6 class="mb-3">Yangi foydalanuvchi qo'shish</h6>
+      <form method="post" action="{{ url_for('admin_create_user') }}">
+        <div class="mb-2">
+          <label class="form-label small">F.I.Sh</label>
+          <input type="text" name="full_name" class="form-control form-control-sm" required>
+        </div>
+        <div class="mb-2">
+          <label class="form-label small">Email</label>
+          <input type="email" name="email" class="form-control form-control-sm" required>
+        </div>
+        <div class="mb-2">
+          <label class="form-label small">Rol</label>
+          <select name="role" class="form-select form-select-sm">
+            <option value="manager">Rahbar</option>
+            <option value="employee">Xodim</option>
+            <option value="user">User (talabnoma)</option>
+            <option value="admin">Admin</option>
+          </select>
+        </div>
+        <div class="mb-2">
+          <label class="form-label small">Parol (ixtiyoriy)</label>
+          <input type="text" name="password" class="form-control form-control-sm">
+        </div>
+        <button class="btn btn-primary btn-sm mt-2">Saqlash</button>
+      </form>
+    </div>
+  </div>
+  <div class="col-md-7">
+    <div class="glass-card">
+      <h6 class="mb-3">Foydalanuvchilar</h6>
+      <table class="table table-sm table-dark-glass align-middle mb-0">
+        <thead>
+          <tr>
+            <th>ID</th><th>F.I.Sh</th><th>Email</th><th>Rol</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for u in users %}
+          <tr>
+            <td>{{ u.id }}</td>
+            <td>{{ u.full_name }}</td>
+            <td>{{ u.email }}</td>
+            <td>{{ u.role }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}
