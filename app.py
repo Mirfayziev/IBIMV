@@ -199,3 +199,25 @@ if __name__ == "__main__":
         db.create_all()
         seed_demo_data(db)
     app.run(debug=True)
+@app.route("/admin/create_user", methods=["POST"])
+@login_required
+def admin_create_user():
+    if current_user.role != "admin":
+        return "Access denied", 403
+
+    full_name = request.form.get("full_name")
+    email = request.form.get("email")
+    role = request.form.get("role")
+    password = request.form.get("password")
+
+    if not password:
+        password = "123456"   # default parol
+
+    hashed = generate_password_hash(password)
+
+    new_user = User(full_name=full_name, email=email, role=role, password_hash=hashed)
+    db.session.add(new_user)
+    db.session.commit()
+
+    flash("Yangi foydalanuvchi yaratildi!", "success")
+    return redirect(url_for("admin_panel"))
