@@ -23,10 +23,12 @@ app = Flask(
 )
 app.config.from_object(Config)
 
-db.init_app(app)
-
-login_manager = LoginManager(app)
-login_manager.login_view = "login"
+@app.route("/init-db")
+def init_db():
+    with app.app_context():
+        db.create_all()
+        seed_demo_data(db)
+    return "Database created and demo data added."
 
 # Upload folder
 os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
