@@ -207,7 +207,32 @@ def employee_panel():
         return redirect(url_for("index"))
 
     tasks = Task.query.filter_by(assignee_id=current_user.id).all()
-    return render_template("employee/panel.html", tasks=tasks)
+    ijro_tasks = IjroTask.query.filter_by(assignee_id=current_user.id).all()
+    return render_template("employee/panel.html", tasks=tasks, ijro_tasks=ijro_tasks)
+
+
+@app.route("/employee/update_task_status/<int:task_id>", methods=["POST"])
+@login_required
+def employee_update_task_status(task_id):
+    if current_user.role != "employee":
+        flash("Ruxsat yo'q", "danger")
+        return redirect(url_for("index"))
+
+    task = Task.query.get(task_id)
+    if not task or task.assignee_id != current_user.id:
+        flash("Topshiriq topilmadi", "danger")
+        return redirect(url_for("employee_panel"))
+
+    new_status = request.form.get("status")
+    if new_status not in ["in_progress", "pending", "done", "rejected"]:
+        flash("Noto'g'ri status", "warning")
+        return redirect(url_for("employee_panel"))
+
+    task.status = new_status
+    db.session.commit()
+
+    flash("Topshiriq holati yangilandi", "success")
+    return redirect(url_for("employee_panel"))
 
 
 # ======================================================
