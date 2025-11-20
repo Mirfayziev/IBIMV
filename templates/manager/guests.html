@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Mehmonlar{% endblock %}
+{% block content %}
+<h4 class="mb-3">Mehmonlar</h4>
+<div class="glass-card mb-3">
+  <form class="row g-2" method="post" action="{{ url_for('manager_add_guest') }}">
+    <div class="col-md-3"><input class="form-control form-control-sm" name="full_name" placeholder="FIO" required></div>
+    <div class="col-md-3"><input class="form-control form-control-sm" name="organization" placeholder="Tashkilot"></div>
+    <div class="col-md-2"><input class="form-control form-control-sm" name="reason" placeholder="Asos (PQ-...)"></div>
+    <div class="col-md-2"><input type="date" class="form-control form-control-sm" name="arrive_date"></div>
+    <div class="col-md-2"><button class="btn btn-primary btn-sm w-100">Qo'shish</button></div>
+  </form>
+</div>
+<div class="glass-card">
+  <table class="table table-sm table-dark table-dark-soft align-middle mb-0">
+    <thead><tr><th>#</th><th>FIO</th><th>Tashkilot</th><th>Asos</th><th>Kelgan</th></tr></thead>
+    <tbody>
+      {% for g in guests %}
+      <tr>
+        <td>{{ loop.index }}</td>
+        <td>{{ g.full_name }}</td>
+        <td>{{ g.organization }}</td>
+        <td>{{ g.reason }}</td>
+        <td>{{ g.arrive_date }}</td>
+      </tr>
+      {% else %}
+      <tr><td colspan="5" class="text-center text-muted">Ma'lumot yo'q</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

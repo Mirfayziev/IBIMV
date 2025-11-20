@@ -2,23 +2,30 @@
 {% block title %}Shartnomalar{% endblock %}
 {% block content %}
 <h4 class="mb-3">Shartnomalar</h4>
+<div class="glass-card mb-3">
+  <form class="row g-2" method="post" action="{{ url_for('manager_add_contract') }}">
+    <div class="col-md-3"><input class="form-control form-control-sm" name="title" placeholder="Nomi" required></div>
+    <div class="col-md-2"><input class="form-control form-control-sm" name="partner" placeholder="Hamkor"></div>
+    <div class="col-md-2"><input class="form-control form-control-sm" name="amount" placeholder="Summa"></div>
+    <div class="col-md-2"><input type="date" class="form-control form-control-sm" name="signed_date"></div>
+    <div class="col-md-3"><button class="btn btn-primary btn-sm w-100">Qo'shish</button></div>
+  </form>
+</div>
 <div class="glass-card">
-  <table class="table table-sm table-dark-glass align-middle mb-0">
-    <thead>
-      <tr><th>#</th><th>Sarlavha</th><th>Hamkor</th><th>Summa</th><th>Holat</th></tr>
-    </thead>
+  <table class="table table-sm table-dark table-dark-soft align-middle mb-0">
+    <thead><tr><th>#</th><th>Nomi</th><th>Hamkor</th><th>Summa</th><th>Status</th></tr></thead>
     <tbody>
-    {% for c in contracts %}
+      {% for c in contracts %}
       <tr>
         <td>{{ loop.index }}</td>
         <td>{{ c.title }}</td>
-        <td>{{ c.partner or '-' }}</td>
-        <td>{{ c.amount }}</td>
+        <td>{{ c.partner }}</td>
+        <td>{{ "{:,.0f}".format(c.amount) }}</td>
         <td>{{ c.status }}</td>
       </tr>
-    {% else %}
-      <tr><td colspan="5" class="text-muted small">Shartnomalar yo'q.</td></tr>
-    {% endfor %}
+      {% else %}
+      <tr><td colspan="5" class="text-center text-muted">Ma'lumot yo'q</td></tr>
+      {% endfor %}
     </tbody>
   </table>
 </div>

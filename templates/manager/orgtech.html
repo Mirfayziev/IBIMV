@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Org texnika{% endblock %}
+{% block content %}
+<h4 class="mb-3">Org texnika</h4>
+<div class="glass-card mb-3">
+  <form class="row g-2" method="post" action="{{ url_for('manager_add_orgtech') }}">
+    <div class="col-md-3"><input class="form-control form-control-sm" name="name" placeholder="Nomi" required></div>
+    <div class="col-md-2"><input class="form-control form-control-sm" name="inventory_number" placeholder="Inventar raqami"></div>
+    <div class="col-md-3"><input class="form-control form-control-sm" name="location" placeholder="Joylashuv"></div>
+    <div class="col-md-2"><input class="form-control form-control-sm" name="responsible_person" placeholder="Mas'ul shaxs"></div>
+    <div class="col-md-2"><button class="btn btn-primary btn-sm w-100">Qo'shish</button></div>
+  </form>
+</div>
+<div class="glass-card mb-3">
+  <form class="d-flex gap-2" method="post" action="{{ url_for('manager_import_orgtech') }}" enctype="multipart/form-data">
+    <input type="file" name="file" class="form-control form-control-sm" accept=".csv" required>
+    <button class="btn btn-outline-light btn-sm">CSV import</button>
+    <a href="{{ url_for('manager_export_orgtech') }}" class="btn btn-outline-light btn-sm">CSV export</a>
+  </form>
+</div>
+<div class="glass-card">
+  <table class="table table-sm table-dark table-dark-soft align-middle mb-0">
+    <thead><tr><th>#</th><th>Nomi</th><th>Inventar</th><th>Joylashuv</th><th>Mas'ul</th><th>Status</th></tr></thead>
+    <tbody>
+      {% for t in items %}
+      <tr>
+        <td>{{ loop.index }}</td>
+        <td>{{ t.name }}</td>
+        <td>{{ t.inventory_number }}</td>
+        <td>{{ t.location }}</td>
+        <td>{{ t.responsible_person }}</td>
+        <td>{{ t.status }}</td>
+      </tr>
+      {% else %}
+      <tr><td colspan="6" class="text-center text-muted">Ma'lumot yo'q</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

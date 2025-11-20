@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}Ombor mahsulotlari{% endblock %}
+{% block content %}
+<h4 class="mb-3">Ombor mahsulotlari</h4>
+<div class="glass-card mb-3">
+  <form class="row g-2" method="post" action="{{ url_for('manager_add_warehouse_product') }}">
+    <div class="col-md-3"><input class="form-control form-control-sm" name="name" placeholder="Nomi" required></div>
+    <div class="col-md-2"><input class="form-control form-control-sm" name="category" placeholder="Kategoriya"></div>
+    <div class="col-md-2"><input class="form-control form-control-sm" name="unit" placeholder="O'lchov (dona, kg)"></div>
+    <div class="col-md-2"><input class="form-control form-control-sm" name="quantity" placeholder="Miqdor"></div>
+    <div class="col-md-2"><input class="form-control form-control-sm" name="price" placeholder="Narx"></div>
+    <div class="col-md-1"><button class="btn btn-primary btn-sm w-100">+</button></div>
+  </form>
+</div>
+<div class="glass-card">
+  <table class="table table-sm table-dark table-dark-soft align-middle mb-0">
+    <thead><tr><th>#</th><th>Nomi</th><th>Kategoriya</th><th>Miqdor</th><th>O'lchov</th><th>Narx</th></tr></thead>
+    <tbody>
+      {% for p in products %}
+      <tr>
+        <td>{{ loop.index }}</td>
+        <td>{{ p.name }}</td>
+        <td>{{ p.category }}</td>
+        <td>{{ p.quantity }}</td>
+        <td>{{ p.unit }}</td>
+        <td>{{ p.price }}</td>
+      </tr>
+      {% else %}
+      <tr><td colspan="6" class="text-center text-muted">Ma'lumot yo'q</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

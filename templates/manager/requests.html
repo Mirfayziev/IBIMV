@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Talabnomalar{% endblock %}
+{% block content %}
+<h4 class="mb-3">Talabnomalar</h4>
+<div class="glass-card">
+  <table class="table table-sm table-dark table-dark-soft align-middle mb-0">
+    <thead><tr><th>#</th><th>Foydalanuvchi</th><th>Bo'lim</th><th>Sana</th><th>Status</th><th>Amal</th></tr></thead>
+    <tbody>
+      {% for r in requests %}
+      <tr>
+        <td>{{ loop.index }}</td>
+        <td>{{ r.creator.full_name if r.creator else '' }}</td>
+        <td>{{ r.department }}</td>
+        <td>{{ r.created_at.date() }}</td>
+        <td>{{ r.status }}</td>
+        <td>
+          <form method="post" action="{{ url_for('manager_update_request_status', request_id=r.id) }}" class="d-flex gap-1">
+            <select name="status" class="form-select form-select-sm">
+              <option value="new" {% if r.status=='new' %}selected{% endif %}>Yangi</option>
+              <option value="approved" {% if r.status=='approved' %}selected{% endif %}>Tasdiqlandi</option>
+              <option value="rejected" {% if r.status=='rejected' %}selected{% endif %}>Rad etildi</option>
+            </select>
+            <button class="btn btn-outline-light btn-sm">OK</button>
+          </form>
+        </td>
+      </tr>
+      {% else %}
+      <tr><td colspan="6" class="text-center text-muted">Talabnomalar yo'q</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

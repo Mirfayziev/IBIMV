@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Tabriknomalar{% endblock %}
+{% block content %}
+<h4 class="mb-3">Tabriknomalar</h4>
+<div class="glass-card mb-3">
+  <form class="row g-2" method="post" action="{{ url_for('manager_add_greeting') }}">
+    <div class="col-md-3">
+      <select name="type" class="form-select form-select-sm">
+        <option value="birthday">Tug'ilgan kun</option>
+        <option value="generic">Umumiy tabrik</option>
+      </select>
+    </div>
+    <div class="col-md-3"><input class="form-control form-control-sm" name="person" placeholder="Kimga" required></div>
+    <div class="col-md-2"><input type="date" class="form-control form-control-sm" name="date"></div>
+    <div class="col-md-3"><input class="form-control form-control-sm" name="description" placeholder="Izoh"></div>
+    <div class="col-md-1"><button class="btn btn-primary btn-sm w-100">+</button></div>
+  </form>
+</div>
+<div class="glass-card">
+  <table class="table table-sm table-dark table-dark-soft align-middle mb-0">
+    <thead><tr><th>#</th><th>Turi</th><th>Kimga</th><th>Sana</th><th>Izoh</th></tr></thead>
+    <tbody>
+      {% for g in greetings %}
+      <tr>
+        <td>{{ loop.index }}</td>
+        <td>{{ g.type }}</td>
+        <td>{{ g.person }}</td>
+        <td>{{ g.date }}</td>
+        <td>{{ g.description }}</td>
+      </tr>
+      {% else %}
+      <tr><td colspan="5" class="text-center text-muted">Ma'lumot yo'q</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

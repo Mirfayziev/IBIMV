@@ -5,13 +5,11 @@
 <div class="row g-3">
   <div class="col-lg-6">
     <div class="glass-card">
-      <h6 class="mb-3">Menga biriktirilgan topshiriqlar</h6>
-      <table class="table table-sm table-dark-glass align-middle mb-0">
-        <thead>
-          <tr><th>Sarlavha</th><th>Holat</th><th>Amal</th></tr>
-        </thead>
+      <h6 class="mb-2">Topshiriqlarim</h6>
+      <table class="table table-sm table-dark table-dark-soft align-middle mb-0">
+        <thead><tr><th>Sarlavha</th><th>Status</th><th>Yangi holat</th></tr></thead>
         <tbody>
-        {% for t in tasks %}
+          {% for t in tasks %}
           <tr>
             <td>{{ t.title }}</td>
             <td>{{ t.status }}</td>
@@ -23,30 +21,34 @@
                   <option value="done">Bajarildi</option>
                   <option value="rejected">Rad etildi</option>
                 </select>
-                <button class="btn btn-primary btn-sm">OK</button>
+                <button class="btn btn-outline-light btn-sm">OK</button>
               </form>
             </td>
           </tr>
-        {% else %}
-          <tr><td colspan="3" class="text-muted small">Topshiriqlar yo'q.</td></tr>
-        {% endfor %}
+          {% else %}
+          <tr><td colspan="3" class="text-center text-muted">Topshiriqlar yo'q</td></tr>
+          {% endfor %}
         </tbody>
       </table>
     </div>
   </div>
   <div class="col-lg-6">
     <div class="glass-card">
-      <h6 class="mb-3">Ijro topshiriqlari</h6>
-      <ul class="list-group list-group-flush small">
-        {% for t in ijro_tasks %}
-        <li class="list-group-item bg-transparent d-flex justify-content-between">
-          <span>{{ t.title }}</span>
-          <span class="badge bg-secondary">{{ t.status }}</span>
-        </li>
-        {% else %}
-        <li class="list-group-item bg-transparent text-muted">Ijro topshiriqlari yo'q.</li>
-        {% endfor %}
-      </ul>
+      <h6 class="mb-2">Ijro topshiriqlari</h6>
+      <table class="table table-sm table-dark table-dark-soft align-middle mb-0">
+        <thead><tr><th>Sarlavha</th><th>Muddat</th><th>Holat</th></tr></thead>
+        <tbody>
+          {% for t in ijro_tasks %}
+          <tr>
+            <td>{{ t.title }}</td>
+            <td>{{ t.due_date }}</td>
+            <td>{{ t.status }}</td>
+          </tr>
+          {% else %}
+          <tr><td colspan="3" class="text-center text-muted">Ijro topshiriqlar yo'q</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
     </div>
   </div>
 </div>

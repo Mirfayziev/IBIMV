@@ -1,50 +1,50 @@
 {% extends "base.html" %}
 {% block title %}Admin panel{% endblock %}
 {% block content %}
-<h4 class="mb-3">Admin panel</h4>
+<h3 class="mb-3">Admin panel</h3>
 <div class="row">
-  <div class="col-md-5">
+  <div class="col-md-4">
     <div class="glass-card mb-3">
-      <h6 class="mb-3">Yangi foydalanuvchi qo'shish</h6>
+      <h5>Foydalanuvchi qo'shish</h5>
       <form method="post" action="{{ url_for('admin_create_user') }}">
         <div class="mb-2">
-          <label class="form-label small">F.I.Sh</label>
+          <label class="form-label">Ism familiya</label>
           <input type="text" name="full_name" class="form-control form-control-sm" required>
         </div>
         <div class="mb-2">
-          <label class="form-label small">Email</label>
+          <label class="form-label">Email</label>
           <input type="email" name="email" class="form-control form-control-sm" required>
         </div>
         <div class="mb-2">
-          <label class="form-label small">Rol</label>
+          <label class="form-label">Rol</label>
           <select name="role" class="form-select form-select-sm">
-            <option value="manager">Rahbar</option>
-            <option value="employee">Xodim</option>
-            <option value="user">User (talabnoma)</option>
-            <option value="admin">Admin</option>
+            <option value="admin">admin</option>
+            <option value="manager">manager</option>
+            <option value="employee">employee</option>
+            <option value="user">user</option>
           </select>
         </div>
         <div class="mb-2">
-          <label class="form-label small">Parol (ixtiyoriy)</label>
-          <input type="text" name="password" class="form-control form-control-sm">
+          <label class="form-label">Parol (ixtiyoriy)</label>
+          <input type="text" name="password" class="form-control form-control-sm" placeholder="bo'sh qoldirsangiz default bo'ladi">
         </div>
         <button class="btn btn-primary btn-sm mt-2">Saqlash</button>
       </form>
     </div>
   </div>
-  <div class="col-md-7">
+  <div class="col-md-8">
     <div class="glass-card">
-      <h6 class="mb-3">Foydalanuvchilar</h6>
-      <table class="table table-sm table-dark-glass align-middle mb-0">
+      <h5>Foydalanuvchilar</h5>
+      <table class="table table-sm table-dark table-striped table-dark-soft align-middle">
         <thead>
           <tr>
-            <th>ID</th><th>F.I.Sh</th><th>Email</th><th>Rol</th>
+            <th>#</th><th>FIO</th><th>Email</th><th>Rol</th>
           </tr>
         </thead>
         <tbody>
           {% for u in users %}
           <tr>
-            <td>{{ u.id }}</td>
+            <td>{{ loop.index }}</td>
             <td>{{ u.full_name }}</td>
             <td>{{ u.email }}</td>
             <td>{{ u.role }}</td>

@@ -1,23 +1,31 @@
 {% extends "base.html" %}
-{% block title %}Avto transportlar{% endblock %}
+{% block title %}Avto transport{% endblock %}
 {% block content %}
 <h4 class="mb-3">Avto transportlar</h4>
+<div class="glass-card mb-3">
+  <form class="row g-2" method="post" action="{{ url_for('manager_add_vehicle') }}">
+    <div class="col-md-2"><input class="form-control form-control-sm" name="plate_number" placeholder="Davlat raqami" required></div>
+    <div class="col-md-2"><input class="form-control form-control-sm" name="model" placeholder="Model" required></div>
+    <div class="col-md-2"><input class="form-control form-control-sm" name="year" placeholder="Yili"></div>
+    <div class="col-md-3"><input class="form-control form-control-sm" name="driver_name" placeholder="Haydovchi"></div>
+    <div class="col-md-3"><button class="btn btn-primary btn-sm w-100">Qo'shish</button></div>
+  </form>
+</div>
 <div class="glass-card">
-  <table class="table table-sm table-dark-glass align-middle mb-0">
-    <thead>
-      <tr><th>Raqam</th><th>Model</th><th>Yil</th><th>Haydovchi</th></tr>
-    </thead>
+  <table class="table table-sm table-dark table-dark-soft align-middle mb-0">
+    <thead><tr><th>#</th><th>Raqam</th><th>Model</th><th>Yil</th><th>Haydovchi</th></tr></thead>
     <tbody>
-    {% for v in vehicles %}
+      {% for v in vehicles %}
       <tr>
+        <td>{{ loop.index }}</td>
         <td>{{ v.plate_number }}</td>
         <td>{{ v.model }}</td>
-        <td>{{ v.year or '-' }}</td>
-        <td>{{ v.driver_name or '-' }}</td>
+        <td>{{ v.year or '' }}</td>
+        <td>{{ v.driver_name or '' }}</td>
       </tr>
-    {% else %}
-      <tr><td colspan="4" class="text-muted small">Transportlar yo'q.</td></tr>
-    {% endfor %}
+      {% else %}
+      <tr><td colspan="5" class="text-center text-muted">Ma'lumot yo'q</td></tr>
+      {% endfor %}
     </tbody>
   </table>
 </div>

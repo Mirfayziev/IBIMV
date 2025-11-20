@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Quyosh panellari{% endblock %}
+{% block content %}
+<h4 class="mb-3">Quyosh panellari</h4>
+<div class="glass-card mb-3">
+  <form class="row g-2" method="post" action="{{ url_for('manager_add_solar') }}">
+    <div class="col-md-3"><input class="form-control form-control-sm" name="building_name" placeholder="Bino nomi" required></div>
+    <div class="col-md-3"><input class="form-control form-control-sm" name="address" placeholder="Manzil"></div>
+    <div class="col-md-2"><input class="form-control form-control-sm" name="installed_power_kw" placeholder="kW"></div>
+    <div class="col-md-2"><input type="date" class="form-control form-control-sm" name="installed_date"></div>
+    <div class="col-md-2"><button class="btn btn-primary btn-sm w-100">Qo'shish</button></div>
+  </form>
+</div>
+<div class="glass-card">
+  <table class="table table-sm table-dark table-dark-soft align-middle mb-0">
+    <thead><tr><th>#</th><th>Bino</th><th>Manzil</th><th>Quvvat (kW)</th><th>O'rnatilgan sana</th></tr></thead>
+    <tbody>
+      {% for s in sites %}
+      <tr>
+        <td>{{ loop.index }}</td>
+        <td>{{ s.building_name }}</td>
+        <td>{{ s.address }}</td>
+        <td>{{ s.installed_power_kw }}</td>
+        <td>{{ s.installed_date }}</td>
+      </tr>
+      {% else %}
+      <tr><td colspan="5" class="text-center text-muted">Ma'lumot yo'q</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

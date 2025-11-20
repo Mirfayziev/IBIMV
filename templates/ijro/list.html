@@ -2,45 +2,36 @@
 {% block title %}Ijro topshiriqlari{% endblock %}
 {% block content %}
 <h4 class="mb-3">Ijro topshiriqlari</h4>
+<div class="glass-card mb-3">
+  <form class="row g-2" method="post" action="{{ url_for('manager_add_ijro') }}">
+    <div class="col-md-3"><input class="form-control form-control-sm" name="title" placeholder="Sarlavha" required></div>
+    <div class="col-md-3"><input class="form-control form-control-sm" name="source" placeholder="Manba (PQ, VMQ va h.k.)"></div>
+    <div class="col-md-3"><input type="date" class="form-control form-control-sm" name="due_date"></div>
+    <div class="col-md-3"><button class="btn btn-primary btn-sm w-100">Qo'shish</button></div>
+  </form>
+</div>
+
 <div class="glass-card">
-  <table class="table table-sm table-dark-glass align-middle mb-0">
-    <thead>
-      <tr>
-        <th>#</th>
-        <th>Sarlavha</th>
-        <th>Manba</th>
-        <th>Kelib tushgan sana</th>
-        <th>Muddat</th>
-        <th>Qolgan kun</th>
-        <th>Holat</th>
-      </tr>
-    </thead>
+  <table class="table table-sm table-dark table-dark-soft align-middle mb-0">
+    <thead><tr><th>#</th><th>Sarlavha</th><th>Manba</th><th>Kelgan</th><th>Muddat</th><th>Holat</th><th>Qolgan kun</th></tr></thead>
     <tbody>
       {% for t in tasks %}
-      {% set d = t.days_left %}
-      {% if d > 7 %}
-        {% set color = 'green' %}
-      {% elif d > 5 %}
-        {% set color = 'yellow' %}
-      {% elif d > 3 %}
-        {% set color = 'orange' %}
-      {% else %}
-        {% set color = 'red' %}
-      {% endif %}
+      {% set days = t.days_left %}
+      {% set color = 'success' %}
+      {% if days <= 3 %}{% set color='danger' %}
+      {% elif days <= 5 %}{% set color='warning' %}
+      {% elif days <= 7 %}{% set color='info' %}{% endif %}
       <tr>
         <td>{{ loop.index }}</td>
         <td>{{ t.title }}</td>
-        <td>{{ t.source or '-' }}</td>
-        <td>{{ t.received_date.strftime('%d.%m.%Y') if t.received_date }}</td>
-        <td>{{ t.due_date.strftime('%d.%m.%Y') if t.due_date }}</td>
-        <td>
-          <span class="ijro-pill {{ color }}"></span>
-          {{ d }} kun
-        </td>
+        <td>{{ t.source }}</td>
+        <td>{{ t.received_date }}</td>
+        <td>{{ t.due_date }}</td>
         <td>{{ t.status }}</td>
+        <td><span class="badge bg-{{ color }}">{{ days }}</span></td>
       </tr>
       {% else %}
-      <tr><td colspan="7" class="text-muted small">Ijro topshiriqlari yo'q.</td></tr>
+      <tr><td colspan="7" class="text-center text-muted">Ma'lumot yo'q</td></tr>
       {% endfor %}
     </tbody>
   </table>

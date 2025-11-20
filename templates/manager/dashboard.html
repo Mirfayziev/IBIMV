@@ -1,9 +1,9 @@
 {% extends "base.html" %}
 {% block title %}Rahbar paneli{% endblock %}
 {% block content %}
-<h4 class="mb-4">Rahbar Paneli</h4>
+<h3 class="mb-4">Rahbar Paneli</h3>
 
-<div class="row g-3 mb-4">
+<div class="row g-3 mb-3">
   <div class="col-md-3">
     <div class="stat-card">
       <div class="stat-label">Jami topshiriqlar</div>
@@ -12,7 +12,7 @@
   </div>
   <div class="col-md-3">
     <div class="stat-card stat-success">
-      <div class="stat-label">Bajarilgan topshiriqlar</div>
+      <div class="stat-label">Bajarilgan</div>
       <div class="stat-value">{{ done_tasks }}</div>
     </div>
   </div>
@@ -24,71 +24,73 @@
   </div>
   <div class="col-md-3">
     <div class="stat-card stat-info">
-      <div class="stat-label">Shartnoma summasi</div>
-      <div class="stat-value">{{ contracts_sum }} $</div>
+      <div class="stat-label">Ijro topshiriqlari</div>
+      <div class="stat-value">{{ ijro_count }}</div>
     </div>
   </div>
 </div>
 
 <div class="row g-3">
-  <div class="col-lg-4">
-    <div class="glass-card h-100">
-      <h6 class="mb-3">Tushgan topshiriqlar</h6>
-      <ul class="list-group list-group-flush small">
-        <li class="list-group-item bg-transparent d-flex justify-content-between">
-          <span>Yangi</span>
-          <span class="badge bg-secondary">{{ total_tasks - done_tasks }}</span>
-        </li>
-        <li class="list-group-item bg-transparent d-flex justify-content-between">
-          <span>Bajarilgan</span>
-          <span class="badge bg-success">{{ done_tasks }}</span>
-        </li>
-        <li class="list-group-item bg-transparent d-flex justify-content-between">
-          <span>Jarayonda</span>
-          <span class="badge bg-warning text-dark">{{ in_progress_tasks }}</span>
-        </li>
-      </ul>
-    </div>
-  </div>
-  <div class="col-lg-4">
-    <div class="glass-card h-100">
-      <h6 class="mb-3">Avto transportlar</h6>
-      {% if vehicles %}
-      <table class="table table-sm table-dark-glass align-middle mb-0">
+  <div class="col-lg-8">
+    <div class="glass-card mb-3">
+      <h6 class="mb-3">Oxirgi topshiriqlar</h6>
+      <table class="table table-sm table-dark table-dark-soft align-middle mb-0">
         <thead>
-          <tr>
-            <th>Raqam</th><th>Model</th><th>Haydovchi</th>
-          </tr>
+          <tr><th>Sarlavha</th><th>Status</th><th>Ijrochi</th><th>Muddat</th></tr>
         </thead>
         <tbody>
-          {% for v in vehicles %}
+          {% for t in latest_tasks %}
           <tr>
-            <td>{{ v.plate_number }}</td>
-            <td>{{ v.model }}</td>
-            <td>{{ v.driver_name or "-" }}</td>
+            <td>{{ t.title }}</td>
+            <td>{{ t.status }}</td>
+            <td>{{ t.assignee.full_name if t.assignee else '' }}</td>
+            <td>{{ t.due_date or '' }}</td>
           </tr>
+          {% else %}
+          <tr><td colspan="4" class="text-center text-muted">Topshiriqlar yo'q</td></tr>
           {% endfor %}
         </tbody>
       </table>
-      {% else %}
-      <p class="text-muted small mb-0">Hali transport qo'shilmagan.</p>
-      {% endif %}
+    </div>
+
+    <div class="glass-card">
+      <h6 class="mb-3">Shartnomalar</h6>
+      <table class="table table-sm table-dark table-dark-soft align-middle mb-0">
+        <thead><tr><th>Nomi</th><th>Hamkor</th><th>Summa</th><th>Status</th></tr></thead>
+        <tbody>
+          {% for c in latest_contracts %}
+          <tr>
+            <td>{{ c.title }}</td>
+            <td>{{ c.partner }}</td>
+            <td>{{ "{:,.0f}".format(c.amount) }}</td>
+            <td>{{ c.status }}</td>
+          </tr>
+          {% else %}
+          <tr><td colspan="4" class="text-center text-muted">Shartnomalar yo'q</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
     </div>
   </div>
+
   <div class="col-lg-4">
-    <div class="glass-card h-100">
-      <h6 class="mb-3">Xodimlar & Mehmonlar</h6>
-      <div class="d-flex justify-content-between mb-2">
-        <span class="small text-muted">Xodim profillari</span>
-        <span class="badge bg-info">{{ employees }}</span>
-      </div>
-      <div class="d-flex justify-content-between mb-2">
-        <span class="small text-muted">Mehmonlar</span>
-        <span class="badge bg-primary">{{ guests }}</span>
-      </div>
-      <p class="small text-muted mb-0 mt-3">
-        Bu sahifa 2-rasmdagi kabi barcha modullarning qisqa statistikasi uchun mo'ljallangan.
-      </p>
+    <div class="glass-card mb-3">
+      <h6 class="mb-3">Avto transportlar</h6>
+      <ul class="list-group list-group-flush small">
+        {% for v in vehicles %}
+        <li class="list-group-item bg-transparent text-light d-flex justify-content-between">
+          <span>{{ v.plate_number }} · {{ v.model }}</span>
+          <span class="text-muted">{{ v.driver_name }}</span>
+        </li>
+        {% else %}
+        <li class="list-group-item bg-transparent text-muted">Transportlar yo'q</li>
+        {% endfor %}
+      </ul>
+    </div>
+    <div class="glass-card">
+      <h6 class="mb-2">Xodimlar & Mehmonlar</h6>
+      <p class="mb-1 small text-muted">Xodim profillari: <strong>{{ employees }}</strong></p>
+      <p class="mb-0 small text-muted">Mehmonlar: <strong>{{ guests }}</strong></p>
     </div>
   </div>
 </div>

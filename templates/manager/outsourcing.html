@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Outsorsing{% endblock %}
+{% block content %}
+<h4 class="mb-3">Outsorsing kompaniyalari</h4>
+<div class="glass-card mb-3">
+  <form class="row g-2" method="post" action="{{ url_for('manager_add_outsourcing') }}">
+    <div class="col-md-3"><input class="form-control form-control-sm" name="name" placeholder="Nomi" required></div>
+    <div class="col-md-2"><input class="form-control form-control-sm" name="contract_number" placeholder="Shartnoma raqami"></div>
+    <div class="col-md-2"><input type="date" class="form-control form-control-sm" name="contract_date"></div>
+    <div class="col-md-2"><input type="date" class="form-control form-control-sm" name="valid_until"></div>
+    <div class="col-md-3"><button class="btn btn-primary btn-sm w-100">Qo'shish</button></div>
+  </form>
+</div>
+<div class="glass-card">
+  <table class="table table-sm table-dark table-dark-soft align-middle mb-0">
+    <thead><tr><th>#</th><th>Nomi</th><th>Shartnoma</th><th>Amal qiladi</th></tr></thead>
+    <tbody>
+      {% for c in companies %}
+      <tr>
+        <td>{{ loop.index }}</td>
+        <td>{{ c.name }}</td>
+        <td>{{ c.contract_number }}</td>
+        <td>{{ c.valid_until }}</td>
+      </tr>
+      {% else %}
+      <tr><td colspan="4" class="text-center text-muted">Ma'lumot yo'q</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

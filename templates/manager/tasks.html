@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Topshiriqlar{% endblock %}
+{% block content %}
+<h4 class="mb-3">Topshiriqlar</h4>
+<div class="glass-card mb-3">
+  <form class="row g-2" method="post" action="{{ url_for('manager_add_task') }}">
+    <div class="col-md-3"><input class="form-control form-control-sm" name="title" placeholder="Sarlavha" required></div>
+    <div class="col-md-4"><input class="form-control form-control-sm" name="description" placeholder="Izoh"></div>
+    <div class="col-md-2">
+      <select name="assignee_id" class="form-select form-select-sm">
+        <option value="">Ijrochi tanlash</option>
+        {% for e in employees %}
+        <option value="{{ e.id }}">{{ e.full_name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-md-2"><input type="date" class="form-control form-control-sm" name="due_date"></div>
+    <div class="col-md-1"><button class="btn btn-primary btn-sm w-100">+</button></div>
+  </form>
+</div>
+<div class="glass-card">
+  <table class="table table-sm table-dark table-dark-soft align-middle mb-0">
+    <thead><tr><th>#</th><th>Sarlavha</th><th>Ijrochi</th><th>Muddat</th><th>Status</th></tr></thead>
+    <tbody>
+      {% for t in tasks %}
+      <tr>
+        <td>{{ loop.index }}</td>
+        <td>{{ t.title }}</td>
+        <td>{{ t.assignee.full_name if t.assignee else '' }}</td>
+        <td>{{ t.due_date or '' }}</td>
+        <td>{{ t.status }}</td>
+      </tr>
+      {% else %}
+      <tr><td colspan="5" class="text-center text-muted">Topshiriqlar yo'q</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

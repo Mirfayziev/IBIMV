@@ -1,26 +1,23 @@
 {% extends "base.html" %}
-{% block title %}Talabnomalar{% endblock %}
+{% block title %}Talabnomalarim{% endblock %}
 {% block content %}
-<h4 class="mb-3">Mening talabnomalarim</h4>
-<div class="mb-3">
-  <a href="{{ url_for('user_new_request') }}" class="btn btn-primary btn-sm">Yangi talabnoma</a>
-</div>
+<h4 class="mb-3">Talabnomalarim</h4>
+<a href="{{ url_for('user_new_request') }}" class="btn btn-primary btn-sm mb-3">Yangi talabnoma</a>
 <div class="glass-card">
-  <table class="table table-sm table-dark-glass align-middle mb-0">
-    <thead>
-      <tr><th>#</th><th>Bo'lim</th><th>Sana</th><th>Holat</th></tr>
-    </thead>
+  <table class="table table-sm table-dark table-dark-soft align-middle mb-0">
+    <thead><tr><th>#</th><th>Bo'lim</th><th>Sana</th><th>Status</th><th>Bandlar</th></tr></thead>
     <tbody>
-    {% for r in requests %}
+      {% for r in requests %}
       <tr>
         <td>{{ loop.index }}</td>
         <td>{{ r.department }}</td>
-        <td>{{ r.created_at.strftime('%d.%m.%Y %H:%M') }}</td>
+        <td>{{ r.created_at.date() }}</td>
         <td>{{ r.status }}</td>
+        <td>{{ r.items|length }}</td>
       </tr>
-    {% else %}
-      <tr><td colspan="4" class="text-muted small">Hali talabnoma yubormagansiz.</td></tr>
-    {% endfor %}
+      {% else %}
+      <tr><td colspan="5" class="text-center text-muted">Talabnomalar yo'q</td></tr>
+      {% endfor %}
     </tbody>
   </table>
 </div>
